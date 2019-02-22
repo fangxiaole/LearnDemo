@@ -12,14 +12,14 @@ import android.widget.Toast;
 
 import com.lele.sharedemo.R;
 import com.libhttp.entity.LoginResult;
-import com.libhttp.subscribers.SubscriberListener;
-import com.p2p.core.P2PSpecial.HttpErrorCode;
-import com.p2p.core.P2PSpecial.HttpSend;
+import com.presenter.LoginPresenter;
+import com.view.LoginView;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, LoginView {
     private Context context;
     private EditText et_account, et_pwd;
     private Button bt_login;
+    private LoginPresenter loginPresenter = new LoginPresenter(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,32 +54,55 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             Toast.makeText(context, R.string.input_pwd, Toast.LENGTH_SHORT).show();
             return;
         }
-        HttpSend.getInstance().login(account, password, new SubscriberListener<LoginResult>() {
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onNext(LoginResult loginResult) {
-                switch (loginResult.getError_code()){
-                    case HttpErrorCode.ERROR_0:
-                        //登录成功
-                        Intent login=new Intent(context,MainActivity.class);
-                        startActivity(login);
-                        finish();
-                        break;
-                    default:
-                        break;
-                }
-
-
-            }
-
-            @Override
-            public void onError(String error_code, Throwable throwable) {
-
-            }
-        });
+        loginPresenter.login(account, password);
+//        HttpSend.getInstance().login(account, password, new SubscriberListener<LoginResult>() {
+//            @Override
+//            public void onStart() {
+//
+//            }
+//
+//            @Override
+//            public void onNext(LoginResult loginResult) {
+//                switch (loginResult.getError_code()) {
+//                    case HttpErrorCode.ERROR_0:
+//                        //登录成功
+//                        Intent login = new Intent(context, MainActivity.class);
+//                        startActivity(login);
+//                        finish();
+//                        break;
+//                    default:
+//                        break;
+//                }
+//
+//
+//            }
+//
+//            @Override
+//            public void onError(String error_code, Throwable throwable) {
+//
+//            }
+//        });
     }
+
+    @Override
+    public void LoginSuccess(LoginResult loginResult) {
+        //登录成功
+        Intent login = new Intent(context, MainActivity.class);
+        startActivity(login);
+        finish();
+    }
+
+    @Override
+    public void LoginFail(String error) {
+        Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+
+
+    }
+
+
+    /**
+     * view 登录成功  登录失败
+     * p    登录 登录成功  登录失败
+     * m    登录
+     */
 }
